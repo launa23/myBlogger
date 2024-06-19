@@ -1,26 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { UsersService } from "../users/users.service";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  //
+  async validateUser(username: string, pass: string): Promise<any> {
+    // findOneUsername() de tim user co email == username trong db
+    const user = await this.usersService.findOneByUsername(username);
+    if (user){
+      const isValid = this.usersService.isValidPassword(pass, user.password)
+      if(isValid === true){
+        return user;
+      }
+    }
+    return null;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async login(user: any) {
+    // Du lieu muon ma hoa trong token
+    const payload = {
+      email: user.email,
+      sub: user._id
+    };
+    return {
+      // ham sign() la sinh ra token, chi voi 1 ham
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }
