@@ -1,6 +1,6 @@
 import { Prop } from '@nestjs/mongoose';
 import { Expose, Transform } from 'class-transformer';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 export class BaseSchema {
   @Expose()
@@ -9,7 +9,7 @@ export class BaseSchema {
 
   @Expose()
   @Transform((params) => params.obj._id.toString())
-  updatedBy: Types.ObjectId;
+  updatedBy: mongoose.Types.ObjectId;
 
   @Expose()
   @Transform((params) => params.obj._id.toString())

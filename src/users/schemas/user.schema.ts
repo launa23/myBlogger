@@ -12,10 +12,10 @@ export class User extends BaseSchema{
   @Prop()
   name: string;
 
-  @Prop({ required: true })
+  @Prop()
   email: string;
 
-  @Prop({ required: true })
+  @Prop()
   password: string;
 
   @Prop()

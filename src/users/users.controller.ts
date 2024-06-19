@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from "@nestjs/
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { IUser } from "./user.interface";
+import { User } from "../utils/decorators/user.decorator";
 
 @Controller('users')
 export class UsersController {
@@ -23,8 +25,8 @@ export class UsersController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @User() user: IUser) {
+    return this.usersService.update(id, updateUserDto, user);
   }
 
   @Delete(':id')

@@ -4,6 +4,7 @@ import { AuthGuard } from "@nestjs/passport";
 import { LocalAuthGuard } from "./auth/local-auth.guard";
 import { JwtService } from "@nestjs/jwt";
 import { AuthService } from "./auth/auth.service";
+import { Public } from "./utils/decorators/public.decorator";
 
 @Controller()
 export class AppController {
@@ -12,14 +13,4 @@ export class AppController {
     private readonly authService: AuthService,
     ) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
-
-  @UseGuards(LocalAuthGuard)
-  @Post("/login")
-  login(@Request() req){
-    return this.authService.login(req.user);
-  }
 }
