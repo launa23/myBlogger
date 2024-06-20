@@ -7,9 +7,9 @@ import { PostsService } from 'src/posts/posts.service';
 import { CategoriesModule } from 'src/categoies/categoies.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PostCategory]), forwardRef(() => PostcategoryModule), CategoriesModule],
+  imports: [TypeOrmModule.forFeature([PostCategory])],
   controllers: [PostcategoryController],
-  providers: [PostcategoryService, PostsService],
+  providers: [PostcategoryService],
   exports: [PostcategoryService]
 })
 export class PostcategoryModule { }

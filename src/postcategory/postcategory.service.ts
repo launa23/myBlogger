@@ -14,9 +14,6 @@ export class PostcategoryService {
   constructor(
     @InjectRepository(PostCategory)
     private readonly postCategoryRepository: Repository<PostCategory>,
-    @Inject(forwardRef(() => PostsService))
-    private readonly postService: PostsService,
-    private readonly categoryService: CategoriesService,
   ) { }
 
   async create(createPostcategoryDto: CreatePostcategoryDto) {

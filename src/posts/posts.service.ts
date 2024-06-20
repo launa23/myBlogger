@@ -1,10 +1,12 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository, Transaction } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostcategoryService } from 'src/postcategory/postcategory.service';
+import { CategoriesService } from 'src/categoies/categoies.service';
+import { PostCategory } from 'src/postcategory/entities/postcategory.entity';
 
 @Injectable()
 export class PostsService {
@@ -12,11 +14,19 @@ export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
-    @Inject(forwardRef(() => PostcategoryService))
     private readonly postCategoryService: PostcategoryService,
+    private readonly categoryService: CategoriesService
   ) { }
 
-  async create(createPostDto: CreatePostDto) {
+  async create( createPostDto: CreatePostDto) {
+    createPostDto.categories.forEach( async categoryID => {
+      const isExistCategory = await this.categoryService.isExistCategory(categoryID);
+      if (!isExistCategory) {
+        throw new NotFoundException(`Không tìm thấy category với id: ${categoryID}`)
+      }
+    });
+
+   
     return await this.postRepository.save(createPostDto);
   }
 
