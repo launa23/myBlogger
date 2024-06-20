@@ -1,8 +1,9 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { PostCategory } from "../../postcategory/entities/postcategory.entity";
+import { BaseSchema } from "../../utils/base.schema";
 
 @Entity()
-export class Category {
+export class Category extends BaseSchema{
   @PrimaryGeneratedColumn()
   id: number;
 

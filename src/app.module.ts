@@ -7,12 +7,13 @@ import { UsersModule } from './users/users.module';
 import { AuthService } from "./auth/auth.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { PostsModule } from './posts/posts.module';
-import { CategoiesModule } from './categoies/categoies.module';
+import { CategoriesModule } from './categoies/categoies.module';
 import { CommentsModule } from './comments/comments.module';
 import { LikesModule } from './likes/likes.module';
 import { PostcategoryModule } from './postcategory/postcategory.module';
 import { TagsModule } from './tags/tags.module';
 import { PosttagModule } from './posttag/posttag.module';
+import { DatabaseModule } from "./database/database.module";
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { PosttagModule } from './posttag/posttag.module';
     AuthModule,
     UsersModule,
     PostsModule,
-    CategoiesModule,
+    CategoriesModule,
     CommentsModule,
     LikesModule,
     PostcategoryModule,

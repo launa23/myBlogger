@@ -1,7 +1,7 @@
 import { ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from "@nestjs/core";
-import { IS_PUBLIC_KEY } from "../utils/decorators/public.decorator";
+import { IS_PUBLIC_KEY } from "../../utils/decorators/public.decorator";
 
 @Injectable()
 //Guard nay se kiem tra token trong req

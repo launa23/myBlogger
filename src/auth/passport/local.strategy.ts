@@ -20,7 +20,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
     // Cai nay chinh la cai tra lai cho req.user
-
     return user;
   }
 }

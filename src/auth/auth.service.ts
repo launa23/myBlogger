@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { IUser } from "../users/user.interface";
 import { User } from "../utils/decorators/user.decorator";
+import { CreateUserDto } from "../users/dto/create-user.dto";
 
 
 @Injectable()
@@ -22,26 +23,39 @@ export class AuthService {
       if(isValid === true){
         return user;
       }
+      else{
+        throw new BadRequestException("Thông tin đăng nhập không hợp lệ!");
+      }
     }
     return null;
   }
 
   async login(user: IUser) {
-    const { email, role, _id, name } = user;
+    const { email, role, id, name } = user;
     // Du lieu muon ma hoa trong token
     const payload = {
       email: user.email,
-      sub: user._id
+      sub: id,
+      name: user.name,
     };
     return {
       // ham sign() la sinh ra token, chi voi 1 ham
       access_token: this.jwtService.sign(payload),
       user: {
-        _id,
+        id,
         name,
         email,
         role
       }
+    };
+  }
+
+  async register(createUser: CreateUserDto) {
+    const user = await this.usersService.create(createUser);
+    return {
+      id: user.id,
+      name: user.name,
+      createdAt: user.createdAt,
     };
   }
 }

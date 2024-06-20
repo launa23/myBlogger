@@ -30,7 +30,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     if(await this.isExistUser(createUserDto.email)){
-      throw new BadRequestException("Email already exists");
+      throw new BadRequestException("Email đã tồn tại");
     }
     createUserDto.password = this.hashPassword(createUserDto.password);
     return await this.userRepository.save({...createUserDto, role: ROLE_USER});
@@ -41,18 +41,18 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    if( !mongoose.Types.ObjectId.isValid(id) ) {
-      throw new BadRequestException("Invalid id of the user");
+    if( !await this.userRepository.findOneById(+id) ) {
+      throw new BadRequestException("User không tồn tại");
     }
     return await this.userRepository.findOneById(+id);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, user :IUser) {
     if( !await this.userRepository.findOneById(+id)) {
-      throw new BadRequestException("User khong ton tai!");
+      throw new BadRequestException("User không tồn tại");
     }
     if(await this.isExistUser(updateUserDto.email)){
-      throw new BadRequestException("Email already exists");
+      throw new BadRequestException("Email đã tồn tại");
     }
     return await this.userRepository.update(+id, { ...updateUserDto});
   }
@@ -60,7 +60,7 @@ export class UsersService {
   async remove(id: number) {
     const isExistUser = await this.userRepository.findOneById(+id);
     if(!isExistUser) {
-      throw new BadRequestException("User khong ton tai");
+      throw new BadRequestException("User không tồn tại");
     }
     // soft delete
     return await this.userRepository.update(+id, {isDeleted: true, deletedAt: new Date()});
