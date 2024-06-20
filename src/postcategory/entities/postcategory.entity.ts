@@ -14,4 +14,6 @@ export class PostCategory {
   @ManyToOne(() => Category, (category) => category.postCategories)
   @JoinColumn()
   category: Category;
+
+  constructor(private post1: Post, private category1: Category){}
 }

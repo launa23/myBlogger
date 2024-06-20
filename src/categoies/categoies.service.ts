@@ -39,6 +39,6 @@ export class CategoriesService {
   }
 
   async isExistCategory(id: number) {
-    return await this.categoryRepository.findOne({ where: { id } }) ? true : false;
+    return await this.categoryRepository.findOne({ where: { id } });
   }
 }

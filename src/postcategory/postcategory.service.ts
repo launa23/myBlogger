@@ -1,11 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { CreatePostcategoryDto } from './dto/create-postcategory.dto';
 import { UpdatePostcategoryDto } from './dto/update-postcategory.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PostCategory } from './entities/postcategory.entity';
+import { Repository } from 'typeorm';
+import { PostsService } from 'src/posts/posts.service';
+import { CategoriesService } from 'src/categoies/categoies.service';
+
 
 @Injectable()
 export class PostcategoryService {
-  create(createPostcategoryDto: CreatePostcategoryDto) {
-    return 'This action adds a new postcategory';
+
+  constructor(
+    @InjectRepository(PostCategory)
+    private readonly postCategoryRepository: Repository<PostCategory>,
+    @Inject(forwardRef(() => PostsService))
+    private readonly postService: PostsService,
+    private readonly categoryService: CategoriesService,
+  ) { }
+
+  async create(createPostcategoryDto: CreatePostcategoryDto) {
+    const isExistPost = await this.postService.isExistPost(createPostcategoryDto.postId);
+    const isExistCategory = await this.categoryService.isExistCategory(createPostcategoryDto.categoryId);
+    if (!isExistPost) {
+      throw new NotFoundException(`Không tìm thấy post với id: ${createPostcategoryDto.postId}`);
+    }
+    else if (!isExistCategory) {
+      throw new NotFoundException(`Không tìm thấy category với id: ${createPostcategoryDto.categoryId}`)
+    }
+    const postcategory = new PostCategory(isExistPost, isExistCategory);
+    return this.postCategoryRepository.save(postcategory);
   }
 
   findAll() {
