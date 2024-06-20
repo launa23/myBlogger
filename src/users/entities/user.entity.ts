@@ -1,31 +1,31 @@
 import { SchemaFactory, Schema, Prop } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
 import { BaseSchema } from "../../utils/base.schema";
-
-export type UserDocument = HydratedDocument<User>;
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 export const ROLE_USER = "USER";
 export const ROLE_ADMIN = "ADMIN";
 
-@Schema({ timestamps: true })
+@Entity()
 export class User extends BaseSchema{
-  @Prop()
+  @PrimaryGeneratedColumn()
+  id: number;
+  @Column()
   name: string;
 
-  @Prop()
+  @Column()
   email: string;
 
-  @Prop()
+  @Column()
   password: string;
 
-  @Prop()
+  @Column()
   age: number;
 
-  @Prop()
+  @Column()
   gender: string;
 
-  @Prop()
+  @Column()
   role: string;
 
 }
-export const UserSchema = SchemaFactory.createForClass(User);

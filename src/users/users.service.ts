@@ -2,15 +2,17 @@ import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import mongoose, { Model } from "mongoose";
-import { ROLE_USER, User } from "./schemas/user.schema";
+import { ROLE_USER, User } from "./entities/user.entity";
 import { InjectModel } from "@nestjs/mongoose";
 import { genSaltSync, hashSync, compareSync } from "bcryptjs";
 import { IUser } from "./user.interface";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name)
-    private usersModel: Model<User>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
 
@@ -31,7 +33,7 @@ export class UsersService {
       throw new BadRequestException("Email already exists");
     }
     createUserDto.password = this.hashPassword(createUserDto.password);
-    return await this.usersModel.create({...createUserDto, role: ROLE_USER});
+    return await this.userRepository.save({...createUserDto, role: ROLE_USER});
   }
 
   findAll() {
@@ -42,7 +44,7 @@ export class UsersService {
     if( !mongoose.Types.ObjectId.isValid(id) ) {
       throw new BadRequestException("Invalid id of the user");
     }
-    return await this.usersModel.findOne({ _id: id });
+    return await this.userRepository.findOneById(+id);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, user :IUser) {
@@ -52,8 +54,7 @@ export class UsersService {
     if(await this.isExistUser(updateUserDto.email)){
       throw new BadRequestException("Email already exists");
     }
-    await this.usersModel.updateOne({_id: id}, {updatedBy: user._id});
-    return await this.usersModel.updateOne({_id: id}, { ...updateUserDto});
+    return await this.userRepository.update(+id, { ...updateUserDto});
   }
 
   async remove(id: number) {
@@ -64,11 +65,11 @@ export class UsersService {
   }
 
   async findOneByUsername(username: string){
-    return await this.usersModel.findOne({email: username});
+    return await this.userRepository.findOneBy({email: username});
   }
 
   async isExistUser(email: string){
-    const isExist = await this.usersModel.findOne({email: email});
+    const isExist = await this.userRepository.findOneBy({email: email});
     return isExist ? true : false;
   }
 }

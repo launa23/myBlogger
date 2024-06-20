@@ -1,26 +1,16 @@
 import { Prop } from '@nestjs/mongoose';
 import { Expose, Transform } from 'class-transformer';
 import mongoose, { Types } from 'mongoose';
+import { Column, CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from "typeorm";
+import { Delete } from "@nestjs/common";
 
 export class BaseSchema {
-  @Expose()
-  @Transform((params) => params.obj._id.toString())
-  createdBy: Types.ObjectId;
-
-  @Expose()
-  @Transform((params) => params.obj._id.toString())
-  updatedBy: mongoose.Types.ObjectId;
-
-  @Expose()
-  @Transform((params) => params.obj._id.toString())
-  deletedBy: Types.ObjectId;
-
-  @Prop({ default: null, required: false })
+  @DeleteDateColumn()
   deletedAt: Date;
 
-  @Prop({ default: new Date(), required: false })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Prop({ default: new Date(), required: false })
+  @UpdateDateColumn()
   updatedAt: Date;
 }
