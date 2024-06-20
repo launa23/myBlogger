@@ -6,6 +6,13 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { UsersModule } from './users/users.module';
 import { AuthService } from "./auth/auth.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { PostsModule } from './posts/posts.module';
+import { CategoiesModule } from './categoies/categoies.module';
+import { CommentsModule } from './comments/comments.module';
+import { LikesModule } from './likes/likes.module';
+import { PostcategoryModule } from './postcategory/postcategory.module';
+import { TagsModule } from './tags/tags.module';
+import { PosttagModule } from './posttag/posttag.module';
 
 @Module({
   imports: [
@@ -27,7 +34,14 @@ import { TypeOrmModule } from "@nestjs/typeorm";
       isGlobal: true
     }),
     AuthModule,
-    UsersModule],
+    UsersModule,
+    PostsModule,
+    CategoiesModule,
+    CommentsModule,
+    LikesModule,
+    PostcategoryModule,
+    TagsModule,
+    PosttagModule],
   controllers: [AppController],
   providers: [AppService],
 })

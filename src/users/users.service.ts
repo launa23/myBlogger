@@ -48,8 +48,8 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, user :IUser) {
-    if( !mongoose.Types.ObjectId.isValid(id) ) {
-      throw new BadRequestException("Invalid id of the user");
+    if( !await this.userRepository.findOneById(+id)) {
+      throw new BadRequestException("User khong ton tai!");
     }
     if(await this.isExistUser(updateUserDto.email)){
       throw new BadRequestException("Email already exists");
@@ -58,10 +58,12 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    if(!mongoose.Types.ObjectId.isValid(id) ) {
-      throw new BadRequestException("Invalid id of the user");
+    const isExistUser = await this.userRepository.findOneById(+id);
+    if(!isExistUser) {
+      throw new BadRequestException("User khong ton tai");
     }
     // soft delete
+    return await this.userRepository.update(+id, {isDeleted: true, deletedAt: new Date()});
   }
 
   async findOneByUsername(username: string){

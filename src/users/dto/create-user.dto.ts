@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsDate, IsEmail, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { Transform } from "class-transformer";
 
 export class CreateUserDto {
   @IsString()
@@ -13,9 +14,10 @@ export class CreateUserDto {
   @IsNotEmpty({message: "Không được để trống Password "})
   password: string;
 
-  @IsNumber()
+  @Transform(({ value }) => new Date(value))
+  @IsDate({message: "Không đúng định dạng ngày sinh"})
   @IsNotEmpty({message: "Không được để trống Age "})
-  age: number;
+  dob: Date;
 
   @IsString()
   @IsNotEmpty({message: "Không được để trống Gender "})

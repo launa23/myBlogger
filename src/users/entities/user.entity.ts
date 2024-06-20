@@ -1,7 +1,10 @@
 import { SchemaFactory, Schema, Prop } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
 import { BaseSchema } from "../../utils/base.schema";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Post } from "../../posts/entities/post.entity";
+import { Like } from "../../likes/entities/like.entity";
+import { Comment } from "../../comments/entities/comment.entity";
 
 export const ROLE_USER = "USER";
 export const ROLE_ADMIN = "ADMIN";
@@ -10,6 +13,7 @@ export const ROLE_ADMIN = "ADMIN";
 export class User extends BaseSchema{
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column()
   name: string;
 
@@ -19,8 +23,8 @@ export class User extends BaseSchema{
   @Column()
   password: string;
 
-  @Column()
-  age: number;
+  @Column({nullable: true})
+  dob: Date;
 
   @Column()
   gender: string;
@@ -28,4 +32,12 @@ export class User extends BaseSchema{
   @Column()
   role: string;
 
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
+
+  @OneToMany(() => Like, (like) => like.user)
+  likes: Like[];
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
 }
