@@ -32,8 +32,8 @@ export class User extends BaseSchema{
   @Column()
   role: string;
 
-  @OneToMany(() => Post, (post) => post.user)
-  posts: Post[];
+  // @OneToMany(() => Post, (post) => post.user)
+  // posts: Post[];
 
   @OneToMany(() => Like, (like) => like.user)
   likes: Like[];

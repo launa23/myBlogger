@@ -5,9 +5,10 @@ import { Like } from "../../likes/entities/like.entity";
 import { Comment } from "../../comments/entities/comment.entity";
 import { PostTag } from "../../posttag/entities/posttag.entity";
 import { BaseSchema } from "src/utils/base.schema";
+import { Tag } from "../../tags/entities/tag.entity";
 
 @Entity()
-export class Post extends BaseSchema{
+export class Post extends BaseSchema {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -17,11 +18,17 @@ export class Post extends BaseSchema{
   @Column({ type: 'text' })
   content: string;
 
-  // mot post xuat hien nhieu trong postCategory
-  @OneToMany(() => PostCategory, (postCategory) => postCategory.post)
-  postCategories: PostCategory[];
+  // // mot post xuat hien nhieu trong postCategory
+  // @OneToMany(() => PostCategory, (postCategory) => postCategory.post)
+  // postCategories: PostCategory[];
 
-  @ManyToOne(() => User, (user) => user.posts)
+  // Một post có 1 tag
+  @ManyToOne(() => Tag)
+  @JoinColumn({ name: "tagId" })
+  tag: Tag;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: "userId" })
   user: User;
 
   @OneToMany(() => Like, (like) => like.post)
@@ -30,6 +37,5 @@ export class Post extends BaseSchema{
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
 
-  @OneToMany(() => PostTag, (postTag) => postTag.post)
-  postTags: PostTag[];
+
 }

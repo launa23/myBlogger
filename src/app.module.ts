@@ -42,8 +42,6 @@ import { DatabaseModule } from "./database/database.module";
     LikesModule,
     PostcategoryModule,
     TagsModule,
-    PosttagModule,
-    
   ],
   controllers: [AppController],
   providers: [AppService],

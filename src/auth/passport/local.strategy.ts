@@ -8,16 +8,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     super();
   }
 
-
-  // Ham nay se tu dong duoc goi khi login nen ham validateUser(username, password) cung se tu dong duoc goi
+  // Ham nay se tu dong duoc goi khi login, nen ham validateUser(username, password) cung se tu dong duoc goi
   async validate(username: string, password: string): Promise<any> {
     let user = await this.authService.validateUser(username, password);
-    // user = {
-    //   email: user.email,
-    //   id: user.id,
-    // }
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("Token không hợp lệ!");
     }
     // Cai nay chinh la cai tra lai cho req.user
     return user;

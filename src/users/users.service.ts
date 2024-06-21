@@ -40,8 +40,8 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  async findOne(id: string) {
-    if( !await this.userRepository.findOneById(+id) ) {
+  async findOne(id: number) {
+    if( !await this.userRepository.findOneById(id) ) {
       throw new BadRequestException("User không tồn tại");
     }
     return await this.userRepository.findOneById(+id);

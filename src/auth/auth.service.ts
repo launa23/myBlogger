@@ -34,9 +34,10 @@ export class AuthService {
     const { email, role, id, name } = user;
     // Du lieu muon ma hoa trong token
     const payload = {
-      email: user.email,
-      sub: id,
-      name: user.name,
+      email: email,
+      id: id,
+      name: name,
+      role: role
     };
     return {
       // ham sign() la sinh ra token, chi voi 1 ham

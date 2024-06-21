@@ -14,6 +14,6 @@ export class Category extends BaseSchema{
   desc: string;
 
   // Thuoc tinh nay se khong duoc hien thi tren DB
-  @OneToMany(() => PostCategory, (postCategory) => postCategory.category)
-  postCategories: PostCategory[];
+  // @OneToMany(() => PostCategory, (postCategory) => postCategory.category)
+  // postCategories: PostCategory[];
 }

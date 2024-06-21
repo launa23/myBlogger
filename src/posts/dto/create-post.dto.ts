@@ -11,11 +11,10 @@ export class CreatePostDto {
 
     @IsArray({message: "Danh sách danh mục phải là 1 mảng"})
     @IsNotEmpty({message: "Không được để trống danh mục "})
-    @IsNumber(null, {each: true, message: "Các phần tử trong danh sách phải là id của danh mục"})
+    // @IsNumber()
     categories: number[];
 
-    @IsArray({message: "Danh sách tag phải là 1 mảng"})
     @IsNotEmpty({message: "Không được để trống tags"})
-    @IsNumber(null, {each: true, message: "Các phần tử trong danh sách phải là id của tag"})
-    tags: number[]
+    @IsNumber({allowNaN: false}, {message: "TagId phải là số!"})
+    tagId: number;
 }

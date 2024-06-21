@@ -7,13 +7,11 @@ export class PostCategory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Post, (post) => post.postCategories)
-  @JoinColumn()
+  @ManyToOne(() => Post)
+  @JoinColumn({name: "postId"})
   post: Post;
 
-  @ManyToOne(() => Category, (category) => category.postCategories)
-  @JoinColumn()
+  @ManyToOne(() => Category)
+  @JoinColumn({name: "categoryId"})
   category: Category;
-
-  constructor(private post1: Post, private category1: Category){}
 }

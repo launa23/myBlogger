@@ -20,8 +20,11 @@ export class TagsService {
     return `This action returns all tags`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tag`;
+  async findOne(id: number) {
+    if ( ! await this.isExistTag(id)){
+      throw new NotFoundException( `Không tìm thấy tag với id: ${id}` );
+    }
+    return await this.tagRepository.findOneById(id);
   }
 
   async update(id: number, updateTagDto: UpdateTagDto) {

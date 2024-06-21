@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { PostCategory } from "../../postcategory/entities/postcategory.entity";
-import { PostTag } from "../../posttag/entities/posttag.entity";
 import { BaseSchema } from "../../utils/base.schema";
+import { User } from "../../users/entities/user.entity";
+import { Post } from "../../posts/entities/post.entity";
 
 @Entity()
 export class Tag extends BaseSchema{
@@ -14,6 +14,7 @@ export class Tag extends BaseSchema{
   @Column()
   desc: string;
 
-  @OneToMany(() => PostTag, (postTag) => postTag.tag)
-  postTags: PostTag[];
+  // // 1 Tag có thể nằm trong nhiểu post
+  // @OneToMany(() => Post, (post) => post.tag)
+  // posts: Post[];
 }

@@ -16,17 +16,8 @@ export class PostcategoryService {
     private readonly postCategoryRepository: Repository<PostCategory>,
   ) { }
 
-  async create(createPostcategoryDto: CreatePostcategoryDto) {
-    const isExistPost = await this.postService.isExistPost(createPostcategoryDto.postId);
-    const isExistCategory = await this.categoryService.isExistCategory(createPostcategoryDto.categoryId);
-    if (!isExistPost) {
-      throw new NotFoundException(`Không tìm thấy post với id: ${createPostcategoryDto.postId}`);
-    }
-    else if (!isExistCategory) {
-      throw new NotFoundException(`Không tìm thấy category với id: ${createPostcategoryDto.categoryId}`)
-    }
-    const postcategory = new PostCategory(isExistPost, isExistCategory);
-    return this.postCategoryRepository.save(postcategory);
+  async create(createPostCategoryDto: PostCategory) {
+    return await this.postCategoryRepository.save(createPostCategoryDto);
   }
 
   findAll() {

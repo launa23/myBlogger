@@ -9,7 +9,7 @@ export class PostcategoryController {
 
   @Post()
   create(@Body() createPostcategoryDto: CreatePostcategoryDto) {
-    return this.postcategoryService.create(createPostcategoryDto);
+    // return this.postcategoryService.create(createPostcategoryDto);
   }
 
   @Get()

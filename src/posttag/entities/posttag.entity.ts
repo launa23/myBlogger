@@ -8,11 +8,11 @@ export class PostTag {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Post, (post) => post.postTags)
-  @JoinColumn()
-  post: Post;
-
-  @ManyToOne(() => Tag, (tag) => tag.postTags)
-  @JoinColumn()
-  tag: Tag;
+  // @ManyToOne(() => Post, (post) => post.postTags)
+  // @JoinColumn()
+  // post: Post;
+  //
+  // @ManyToOne(() => Tag, (tag) => tag.postTags)
+  // @JoinColumn()
+  // tag: Tag;
 }
