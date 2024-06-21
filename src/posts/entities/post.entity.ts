@@ -30,12 +30,10 @@ export class Post extends BaseSchema {
   @ManyToOne(() => User)
   @JoinColumn({ name: "userId" })
   user: User;
-
-  @OneToMany(() => Like, (like) => like.post)
-  likes: Like[];
-
-  @OneToMany(() => Comment, (comment) => comment.post)
-  comments: Comment[];
-
-
+  //
+  // @OneToMany(() => Like, (like) => like.post)
+  // likes: Like[];
+  //
+  // @OneToMany(() => Comment, (comment) => comment.post)
+  // comments: Comment[];
 }

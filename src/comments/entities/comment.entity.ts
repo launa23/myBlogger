@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 import { Post } from "../../posts/entities/post.entity";
 
@@ -10,15 +10,15 @@ export class Comment {
   @Column({type: 'text'})
   content: string;
 
-  @ManyToOne(() => User, (user) => user.comments)
+  @ManyToOne(() => User)
+  @JoinColumn({name: "userId"})
   user: User;
 
-  @ManyToOne(() => Post, (post) => post.comments)
+  @ManyToOne(() => Post)
+  @JoinColumn({name: "postId"})
   post: Post;
 
-  @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true })
+  @ManyToOne(() => Comment, { nullable: true })
+  @JoinColumn({name: "parentId"})
   parent: Comment;
-
-  @OneToMany(() => Comment, (comment) => comment.parent)
-  replies: Comment[];
 }

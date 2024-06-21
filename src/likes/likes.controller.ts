@@ -2,19 +2,23 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { LikesService } from './likes.service';
 import { CreateLikeDto } from './dto/create-like.dto';
 import { UpdateLikeDto } from './dto/update-like.dto';
+import { User } from "../utils/decorators/user.decorator";
+import { IUser } from "../users/user.interface";
+import { ResponseMessage } from "../utils/decorators/response_message.decorator";
 
 @Controller('likes')
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
 
   @Post()
-  create(@Body() createLikeDto: CreateLikeDto) {
-    return this.likesService.create(createLikeDto);
+  @ResponseMessage("Like like like...")
+  create(@Body() createLikeDto: CreateLikeDto, @User() user: IUser) {
+    return this.likesService.sendLike(createLikeDto, user.id);
   }
 
-  @Get()
-  findAll() {
-    return this.likesService.findAll();
+  @Get('post/:id')
+  findAllByPost(@Param('id') postId: string) {
+    return this.likesService.getUsersWhoLikedPost(+postId);
   }
 
   @Get(':id')

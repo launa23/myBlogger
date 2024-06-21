@@ -11,7 +11,6 @@ export class CreatePostDto {
 
     @IsArray({message: "Danh sách danh mục phải là 1 mảng"})
     @IsNotEmpty({message: "Không được để trống danh mục "})
-    // @IsNumber()
     categories: number[];
 
     @IsNotEmpty({message: "Không được để trống tags"})

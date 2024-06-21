@@ -12,6 +12,7 @@ import { TagsService } from "../tags/tags.service";
 import { createMongooseAsyncProviders } from "@nestjs/mongoose/dist/mongoose.providers";
 import { IUser } from "../users/user.interface";
 import { UsersService } from "../users/users.service";
+import { UpdateCategoriesPostDto } from "./dto/update-categories-post";
 
 @Injectable()
 export class PostsService {
@@ -35,8 +36,7 @@ export class PostsService {
           throw new BadRequestException(`Không tìm thấy category với id: ${categoryID}`)
         }
         categories.push(isExistCategory);
-      }
-      ;
+      };
 
       const postDto = new Post();
       postDto.tag = tag;
@@ -73,15 +73,55 @@ export class PostsService {
     return `This action returns a #${id} post`;
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async updateContent(id: number, updatePostDto: UpdatePostDto, user: IUser) {
+    let post = await this.isExistPost(id);
+    let tag = await this.tagsService.isExistTag(updatePostDto.tagId);
+    if ( !tag ){
+      throw new NotFoundException(`Không tìm thấy tag với id là: ${id}`);
+    }
+    let postNew = new Post();
+    postNew.tag = tag;
+    postNew.title = updatePostDto.title;
+    postNew.content = updatePostDto.content;
+    return await this.postRepository.update({id}, postNew);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async updateCategories(id: number, updateDto: UpdateCategoriesPostDto){
+      let post = await this.isExistPost(id);
+
+      let categories = await this.categoryService.findByIds(updateDto.categories);
+      try {
+        const postCategories = categories.map( async (category) => {
+          const postCategory = new PostCategory();
+          postCategory.post = post;
+          postCategory.category = category;
+          await this.postCategoryService.create(postCategory);
+        });
+        await this.postCategoryService.delete(post);
+        return `Cập nhật thành công danh mục của post: ${id}`;
+      }
+      catch (err){
+        throw new Error("Có lỗi xảy ra trong quá trình thực thi! Vui lòng thử lại sau!");
+      }
+  }
+
+
+  async remove(id: number) {
+    let post = await this.isExistPost(id);
+    try {
+      await this.postCategoryService.softDelete(post);
+      return await this.postRepository.update({id}, {isDeleted: true, deletedAt: new Date()});
+    }
+    catch (err){
+      throw new Error("Có lỗi xảy ra trong quá trình thực thi!")
+    }
   }
 
   async isExistPost(id: number) {
-    return await this.postRepository.findOneById(id);
+    let isExistPost = await this.postRepository.findOneById(id);
+    if ( !isExistPost ){
+      throw new NotFoundException(`Không tìm thấy post với id là: ${id}`);
+    }
+    return isExistPost;
   }
 }

@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Post } from "../../posts/entities/post.entity";
 import { Category } from "../../categoies/entities/category.entity";
 
@@ -14,4 +14,7 @@ export class PostCategory {
   @ManyToOne(() => Category)
   @JoinColumn({name: "categoryId"})
   category: Category;
+
+  @Column({ default: false })
+  isDeleted: boolean;
 }

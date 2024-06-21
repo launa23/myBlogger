@@ -35,9 +35,9 @@ export class User extends BaseSchema{
   // @OneToMany(() => Post, (post) => post.user)
   // posts: Post[];
 
-  @OneToMany(() => Like, (like) => like.user)
-  likes: Like[];
-
-  @OneToMany(() => Comment, (comment) => comment.user)
-  comments: Comment[];
+  // @OneToMany(() => Like, (like) => like.user)
+  // likes: Like[];
+  //
+  // @OneToMany(() => Comment, (comment) => comment.user)
+  // comments: Comment[];
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, ParseFilePipeBuilder } from "@nestjs/common";
 import { CreateCategoryDto } from './dto/create-categoy.dto';
 import { UpdateCategoryDto } from './dto/update-categoy.dto';
 import { Repository } from "typeorm";
@@ -22,6 +22,15 @@ export class CategoriesService {
 
   findOne(id: number) {
     return `This action returns a #${id} categoy`;
+  }
+
+  async findByIds(ids: number[]) {
+    for(let id of ids){
+        if ( ! await this.isExistCategory(id)) {
+          throw new NotFoundException(`Không tìm thấy category với id là: ${id}`);
+        }
+    }
+    return this.categoryRepository.findByIds(ids);
   }
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
