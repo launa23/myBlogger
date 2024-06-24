@@ -23,7 +23,7 @@ export class PostsController {
   @Get()
   async findAll(@Query("currentPage") currentPage: string,
                 @Query("limit") limit: string) {
-    const result = await this.postsService.findAllOrOne(+currentPage, +limit);
+    const result = await this.postsService.findAll(+currentPage, +limit);
     return result.length > 0 ? result : "Không có bài post nào!";
   }
 
@@ -33,10 +33,17 @@ export class PostsController {
     return this.postsService.findByCategory(cateName);
   }
 
+  @ResponseMessage("Lấy ra post theo tag")
+  @Get('/tag')
+  async getByTag(@Query('tagName') tagName: string) {
+    const result = await this.postsService.findByTag(tagName);
+    return result.length > 0 ? result : `Không có bài post nào với tag là ${tagName}!`;
+  }
+
   @ResponseMessage("Lấy ra post theo id")
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const result = await this.postsService.findAllOrOne(+id);
+    const result = await this.postsService.getOneById(+id);
     return result.length > 0 ? result : `Không có bài post nào với id là ${id}!`;
   }
 

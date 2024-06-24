@@ -9,14 +9,10 @@ import { CategoriesService } from 'src/categoies/categoies.service';
 import { PostCategory } from 'src/postcategory/entities/postcategory.entity';
 import { Category } from "../categoies/entities/category.entity";
 import { TagsService } from "../tags/tags.service";
-import { createMongooseAsyncProviders } from "@nestjs/mongoose/dist/mongoose.providers";
 import { IUser } from "../users/user.interface";
 import { UsersService } from "../users/users.service";
 import { UpdateCategoriesPostDto } from "./dto/update-categories-post";
-import { Like } from "../likes/entities/like.entity";
-import { LikeRepository } from "../likes/like.repository";
 import { groupedCategory } from "../utils/transform";
-import { IPost } from "./post.interface";
 
 @Injectable()
 export class PostsService {
@@ -65,41 +61,26 @@ export class PostsService {
     }
   }
 
-  async findAllOrOne(limit?: number, currentPage?: number, id? : number){
-    const qbd = this.postRepository.createQueryBuilder('post')
-      .leftJoinAndSelect( 'post.likes', 'like')
-      .leftJoinAndSelect( 'post.comments', 'cmt')
-      .leftJoinAndSelect( 'post.tag', 'tag')
-      .leftJoinAndSelect( 'post.postCategories', 'pc')
-      .leftJoinAndSelect( 'post.user', 'user')
-      .leftJoinAndSelect( 'pc.category', 'cate')
-      .where("post.isDeleted = false")
-      .select([
-        'post.id',
-        'post.title',
-        'post.userId',
-        'tag.label',
-        'cate.name',
-        'user.name',
-        'post.createdAt',
-        'COUNT(like.id) AS totalLikes',
-        'COUNT(cmt.id) AS totalComments',
-      ])
-      .groupBy('post.id, post.title, post.userId, tag.label, cate.name, user.name, post.createdAt');
-    if (id){
-      qbd.andWhere("post.id = :id", {id});
-    }
-    // if (currentPage && limit){
-    //   qbd.skip((currentPage - 1) * limit)
-    //     .take(limit);
-    // }
+  async findAll(limit?: number, currentPage?: number){
+    const qbd = this.queryBuilder();
     const arr = await qbd.getRawMany();
     return groupedCategory(arr);
   }
 
+  async getOneById(id: number){
+    const qbd = this.queryBuilder().andWhere("post.id = :id", {id});
+    return groupedCategory(await qbd.getRawMany());
+  }
+
   async findByCategory(cateName: string){
-    const arr = await this.findAllOrOne();
+    const arr = await this.findAll();
     return arr.filter(post => post.cate_name.includes(cateName));
+  }
+
+  async findByTag(tagName: string){
+    const qbd = this.queryBuilder();
+    qbd.andWhere("tag.label = :tagName", {tagName});
+    return groupedCategory(await qbd.getRawMany());
   }
 
   findAllByUserId(userId: number){
@@ -169,5 +150,28 @@ export class PostsService {
       throw new NotFoundException(`Không tìm thấy post với id là: ${id}`);
     }
     return isExistPost;
+  }
+
+  queryBuilder(){
+    return this.postRepository.createQueryBuilder('post')
+      .leftJoinAndSelect( 'post.likes', 'like')
+      .leftJoinAndSelect( 'post.comments', 'cmt')
+      .leftJoinAndSelect( 'post.tag', 'tag')
+      .leftJoinAndSelect( 'post.postCategories', 'pc')
+      .leftJoinAndSelect( 'post.user', 'user')
+      .leftJoinAndSelect( 'pc.category', 'cate')
+      .where("post.isDeleted = false")
+      .select([
+        'post.id',
+        'post.title',
+        'post.userId',
+        'tag.label',
+        'cate.name',
+        'user.name',
+        'post.createdAt',
+        'COUNT(like.id) AS totalLikes',
+        'COUNT(cmt.id) AS totalComments',
+      ])
+      .groupBy('post.id, post.title, post.userId, tag.label, cate.name, user.name, post.createdAt');
   }
 }
