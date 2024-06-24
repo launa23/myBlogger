@@ -33,7 +33,7 @@ export class User extends BaseSchema{
   @Column()
   role: string;
 
-  @OneToMany(() => Post, (post) => post.users)
+  @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
   //
   // @BeforeInsert()

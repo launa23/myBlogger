@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query } from "@nestjs/common";
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -6,6 +6,8 @@ import { User } from "../utils/decorators/user.decorator";
 import { IUser } from "../users/user.interface";
 import { ResponseMessage } from "../utils/decorators/response_message.decorator";
 import { UpdateCategoriesPostDto } from "./dto/update-categories-post";
+import { groupedCategory } from "../utils/transform";
+import { QueryResult } from "typeorm";
 
 @Controller('posts')
 export class PostsController {
@@ -17,15 +19,27 @@ export class PostsController {
     return await this.postsService.create(createPostDto, user.id);
   }
 
+  @ResponseMessage("Lấy tất cả post")
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  async findAll(@Query("currentPage") currentPage: string,
+                @Query("limit") limit: string) {
+    const result = await this.postsService.findAllOrOne(+currentPage, +limit);
+    return result.length > 0 ? result : "Không có bài post nào!";
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(+id);
+  @ResponseMessage("Lấy ra tất cả bài viết theo danh mục")
+  @Get('category')
+  getAllByCategory(@Query("categoryName") cateName: string){
+    return this.postsService.findByCategory(cateName);
   }
+
+  @ResponseMessage("Lấy ra post theo id")
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const result = await this.postsService.findAllOrOne(+id);
+    return result.length > 0 ? result : `Không có bài post nào với id là ${id}!`;
+  }
+
   @ResponseMessage("Cập nhật bài viết")
   @Put('content/:id')
   updateContent(@Param('id') id: string,
@@ -33,13 +47,6 @@ export class PostsController {
                 @User() user: IUser) {
     return this.postsService.updateContent(+id, updatePostDto, user);
   }
-
-  @ResponseMessage("Lấy ra tất cả bài viết của một user")
-  @Get('user/:userId')
-  getAllByUser(@Param('userId') userId: number){
-    return this.postsService.findAllByUserId(userId);
-  }
-
 
   @ResponseMessage("Cập nhật danh mục bài viết")
   @Put('categories/:id')
