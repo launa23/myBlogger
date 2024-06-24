@@ -34,6 +34,13 @@ export class PostsController {
     return this.postsService.updateContent(+id, updatePostDto, user);
   }
 
+  @ResponseMessage("Lấy ra tất cả bài viết của một user")
+  @Get('user/:userId')
+  getAllByUser(@Param('userId') userId: number){
+    return this.postsService.findAllByUserId(userId);
+  }
+
+
   @ResponseMessage("Cập nhật danh mục bài viết")
   @Put('categories/:id')
   updateCategories(@Param('id') id: string, @Body() updatePostDto: UpdateCategoriesPostDto) {

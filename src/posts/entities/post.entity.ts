@@ -18,22 +18,23 @@ export class Post extends BaseSchema {
   @Column({ type: 'text' })
   content: string;
 
-  // // mot post xuat hien nhieu trong postCategory
-  // @OneToMany(() => PostCategory, (postCategory) => postCategory.post)
-  // postCategories: PostCategory[];
-
   // Một post có 1 tag
   @ManyToOne(() => Tag)
   @JoinColumn({ name: "tagId" })
   tag: Tag;
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: "userId" })
-  user: User;
+  @ManyToOne(() => User, (user) => user.posts)
+  // @JoinColumn({ name: "userId" })
+  users: User[];
+
+  // mot post xuat hien nhieu trong postCategory
+  @OneToMany(() => PostCategory, (postCategory) => postCategory.post)
+  postCategories: PostCategory[];
+
   //
-  // @OneToMany(() => Like, (like) => like.post)
-  // likes: Like[];
+  @OneToMany(() => Like, (like) => like.post)
+  likes: Like[];
   //
-  // @OneToMany(() => Comment, (comment) => comment.post)
-  // comments: Comment[];
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments: Comment[];
 }

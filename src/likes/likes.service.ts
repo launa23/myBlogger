@@ -3,7 +3,7 @@ import { CreateLikeDto } from './dto/create-like.dto';
 import { UpdateLikeDto } from './dto/update-like.dto';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Like } from "./entities/like.entity";
-import { DataSource, getRepository, Repository } from "typeorm";
+import { DataSource, getRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { UsersService } from "../users/users.service";
 import { PostsService } from "../posts/posts.service";
 import { Post } from "../posts/entities/post.entity";
@@ -42,13 +42,14 @@ export class LikesService {
     return `This action returns all likes`;
   }
 
-  async getUsersWhoLikedPost(postId: number) {
-    const likes = await this.likeRepository.createQueryBuilder("likes")
-      .where('likes.postId = :postId', { postId })
-      .innerJoinAndSelect('like.user', 'user')
-      .getOne();
+  async getAllPost(): Promise<{ id: number; content: string; title: string; totalLike: number }[]> {
+    const queryBuilder: SelectQueryBuilder<Like> = this.likeRepository.createQueryBuilder('lk')
+      .innerJoin('lk.post', 'p')
+      // .where('p.isDeleted = false')
+      .select(['p.id', 'p.content', 'p.title', 'COUNT(p.id) AS totalLike'])
+      .groupBy('p.id, p.content, p.title');
 
-    return likes;
+    return queryBuilder.getRawMany();
   }
 
   findOne(id: number) {

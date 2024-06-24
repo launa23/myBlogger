@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException, forwardRef, BadGatewayException, BadRequestException } from "@nestjs/common";
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Repository, Transaction, TransactionOptions, EntityManager } from 'typeorm';
+import { Repository, Transaction, TransactionOptions, EntityManager, SelectQueryBuilder } from "typeorm";
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostcategoryService } from 'src/postcategory/postcategory.service';
@@ -13,6 +13,8 @@ import { createMongooseAsyncProviders } from "@nestjs/mongoose/dist/mongoose.pro
 import { IUser } from "../users/user.interface";
 import { UsersService } from "../users/users.service";
 import { UpdateCategoriesPostDto } from "./dto/update-categories-post";
+import { Like } from "../likes/entities/like.entity";
+import { LikeRepository } from "../likes/like.repository";
 
 @Injectable()
 export class PostsService {
@@ -20,6 +22,8 @@ export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+    // @InjectRepository(Like)
+    // private readonly likeRepository: LikeRepository,
     private readonly postCategoryService: PostcategoryService,
     private readonly categoryService: CategoriesService,
     private readonly tagsService: TagsService,
@@ -38,18 +42,12 @@ export class PostsService {
         categories.push(isExistCategory);
       };
 
-      const postDto = new Post();
-      postDto.tag = tag;
-      postDto.content = createPostDto.content;
-      postDto.title = createPostDto.title;
-      postDto.user = user;
-
-      const post = await this.postRepository.save(postDto);
+      const post = await this.postRepository.save({...createPostDto, user, tag});
     try {
       categories.forEach(async category => {
         let postCategoryService1 = new PostCategory();
         postCategoryService1.category = category;
-        postCategoryService1.post = postDto;
+        postCategoryService1.post = post;
         await this.postCategoryService.create(postCategoryService1);
       })
       return {
@@ -65,16 +63,60 @@ export class PostsService {
     }
   }
 
-  findAll() {
-    return `This action returns all posts`;
+  async findAll(): Promise<any[]> {
+    let arr = await this.postRepository.createQueryBuilder('post')
+      .leftJoinAndSelect( 'post.likes', 'like')
+      .leftJoinAndSelect( 'post.comments', 'cmt')
+      .leftJoinAndSelect( 'post.tag', 'tag')
+      .leftJoinAndSelect( 'post.postCategories', 'pc')
+      .leftJoinAndSelect( 'pc.category', 'cate')
+      .where("post.isDeleted = false")
+      .select([
+        'post.id',
+        'post.title',
+        'post.content',
+        'post.usersId',
+        'tag.label',
+        'cate.name',
+        'post.createdAt',
+        'COUNT(like.id) AS totalLikes',
+        'COUNT(cmt.id) AS totalComments',
+      ])
+      .groupBy('post.id, post.title, post.content, post.usersId, tag.label, cate.name, post.createdAt')
+      .getRawMany();
+
+    const result = arr.reduce((acc, cur) => {
+      if ( !acc[cur.post_id] ){
+        acc[cur.post_id] = {
+          post_id: cur.post_id,
+          post_title: cur.post_title,
+          post_content: cur.post_content,
+          tag_label: cur.tag_label,
+          created_at: cur.post_createdAt,
+          usersId: cur.usersId,
+          total_likes: cur.totallikes,
+          total_comments: cur.totalcomments,
+          cate_name: [cur.cate_name]
+        }
+      }
+      else{
+        acc[cur.post_id].cate_name.push(cur.cate_name)
+      }
+      return acc;
+    },{})
+    return Object.values(result);
+  }
+
+  findAllByUserId(userId: number){
+
   }
 
   async findOne(id: number) {
-    let isExistPost = await this.postRepository.findOneById(id);
-    if ( !isExistPost ){
+    let post = await this.postRepository.findOneById(id);
+    if ( !post ){
       throw new NotFoundException(`Không tìm thấy post với id là: ${id}`);
     }
-    return isExistPost;
+    return post;
   }
 
   async updateContent(id: number, updatePostDto: UpdatePostDto, user: IUser) {

@@ -17,6 +17,7 @@ import { DatabaseModule } from "./database/database.module";
 
 @Module({
   imports: [
+    // DatabaseModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -34,6 +35,7 @@ import { DatabaseModule } from "./database/database.module";
     ConfigModule.forRoot({
       isGlobal: true
     }),
+
     AuthModule,
     UsersModule,
     PostsModule,
