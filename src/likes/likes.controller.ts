@@ -18,12 +18,17 @@ export class LikesController {
 
   @Get('post/:id')
   findAllByPost(@Param('id') postId: string) {
-    return this.likesService.getUsersWhoLikedPost(+postId);
+    return "this.likesService.getUsersWhoLikedPost(+postId)";
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.likesService.findOne(+id);
+  }
+
+  @Get()
+  findAll() {
+    return this.likesService.getAllPost();
   }
 
   @Patch(':id')

@@ -14,7 +14,7 @@ export class Tag extends BaseSchema{
   @Column()
   desc: string;
 
-  // // 1 Tag có thể nằm trong nhiểu post
-  // @OneToMany(() => Post, (post) => post.tag)
-  // posts: Post[];
+  // 1 Tag có thể nằm trong nhiểu post
+  @OneToMany(() => Post, (post) => post.tag)
+  posts: Post[];
 }

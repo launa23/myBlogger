@@ -32,6 +32,9 @@ export class User extends BaseSchema{
 
   @Column()
   role: string;
+
+  @OneToMany(() => Post, (post) => post.users)
+  posts: Post[];
   //
   // @BeforeInsert()
   //   // Hash password

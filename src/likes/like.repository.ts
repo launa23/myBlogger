@@ -10,16 +10,8 @@ export class LikeRepository extends Repository<Like>{
   constructor(
     @InjectRepository(Like)
     private readonly likeRepository: Repository<Like>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
   ) {
     super(likeRepository.target, likeRepository.manager, likeRepository.queryRunner);
   }
 
-  async findLikesWithUsers(): Promise<Like[]> {
-    return await this.likeRepository.createQueryBuilder('like')
-      .innerJoinAndSelect('like.user', 'user')
-      .select(['like.*'])
-      .getMany();
-  }
 }

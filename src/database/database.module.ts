@@ -1,6 +1,7 @@
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Module } from "@nestjs/common";
+import { DatabaseService } from "./database.service";
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { Module } from "@nestjs/common";
       inject: [ConfigService],
     }),
   ],
-  providers: [ConfigService],
-  // exports: [DatabaseService],
+  providers: [ConfigService, DatabaseService],
+  exports: [TypeOrmModule, DatabaseService],
 })
 export class DatabaseModule {}
