@@ -15,6 +15,8 @@ import { UsersService } from "../users/users.service";
 import { UpdateCategoriesPostDto } from "./dto/update-categories-post";
 import { Like } from "../likes/entities/like.entity";
 import { LikeRepository } from "../likes/like.repository";
+import { groupedCategory } from "../utils/transform";
+import { IPost } from "./post.interface";
 
 @Injectable()
 export class PostsService {
@@ -63,56 +65,54 @@ export class PostsService {
     }
   }
 
-  async findAll(): Promise<any[]> {
-    let arr = await this.postRepository.createQueryBuilder('post')
+  async findAllOrOne(limit?: number, currentPage?: number, id? : number){
+    const qbd = this.postRepository.createQueryBuilder('post')
       .leftJoinAndSelect( 'post.likes', 'like')
       .leftJoinAndSelect( 'post.comments', 'cmt')
       .leftJoinAndSelect( 'post.tag', 'tag')
       .leftJoinAndSelect( 'post.postCategories', 'pc')
+      .leftJoinAndSelect( 'post.user', 'user')
       .leftJoinAndSelect( 'pc.category', 'cate')
       .where("post.isDeleted = false")
       .select([
         'post.id',
         'post.title',
-        'post.content',
-        'post.usersId',
+        'post.userId',
         'tag.label',
         'cate.name',
+        'user.name',
         'post.createdAt',
         'COUNT(like.id) AS totalLikes',
         'COUNT(cmt.id) AS totalComments',
       ])
-      .groupBy('post.id, post.title, post.content, post.usersId, tag.label, cate.name, post.createdAt')
-      .getRawMany();
+      .groupBy('post.id, post.title, post.userId, tag.label, cate.name, user.name, post.createdAt');
+    if (id){
+      qbd.andWhere("post.id = :id", {id});
+    }
+    // if (currentPage && limit){
+    //   qbd.skip((currentPage - 1) * limit)
+    //     .take(limit);
+    // }
+    const arr = await qbd.getRawMany();
+    return groupedCategory(arr);
+  }
 
-    const result = arr.reduce((acc, cur) => {
-      if ( !acc[cur.post_id] ){
-        acc[cur.post_id] = {
-          post_id: cur.post_id,
-          post_title: cur.post_title,
-          post_content: cur.post_content,
-          tag_label: cur.tag_label,
-          created_at: cur.post_createdAt,
-          usersId: cur.usersId,
-          total_likes: cur.totallikes,
-          total_comments: cur.totalcomments,
-          cate_name: [cur.cate_name]
-        }
-      }
-      else{
-        acc[cur.post_id].cate_name.push(cur.cate_name)
-      }
-      return acc;
-    },{})
-    return Object.values(result);
+  async findByCategory(cateName: string){
+    const arr = await this.findAllOrOne();
+    return arr.filter(post => post.cate_name.includes(cateName));
   }
 
   findAllByUserId(userId: number){
 
   }
 
+  async findById(id: number){
+
+  }
+
+
   async findOne(id: number) {
-    let post = await this.postRepository.findOneById(id);
+    const post = await this.postRepository.findOneById(id);
     if ( !post ){
       throw new NotFoundException(`Không tìm thấy post với id là: ${id}`);
     }
@@ -120,12 +120,12 @@ export class PostsService {
   }
 
   async updateContent(id: number, updatePostDto: UpdatePostDto, user: IUser) {
-    let post = await this.isExistPost(id);
-    let tag = await this.tagsService.isExistTag(updatePostDto.tagId);
+    const post = await this.isExistPost(id);
+    const tag = await this.tagsService.isExistTag(updatePostDto.tagId);
     if ( !tag ){
       throw new NotFoundException(`Không tìm thấy tag với id là: ${id}`);
     }
-    let postNew = new Post();
+    const postNew = new Post();
     postNew.tag = tag;
     postNew.title = updatePostDto.title;
     postNew.content = updatePostDto.content;
@@ -133,9 +133,9 @@ export class PostsService {
   }
 
   async updateCategories(id: number, updateDto: UpdateCategoriesPostDto){
-      let post = await this.isExistPost(id);
+      const post = await this.isExistPost(id);
 
-      let categories = await this.categoryService.findByIds(updateDto.categories);
+      const categories = await this.categoryService.findByIds(updateDto.categories);
       try {
         const postCategories = categories.map( async (category) => {
           const postCategory = new PostCategory();

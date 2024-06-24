@@ -25,7 +25,7 @@ export class Post extends BaseSchema {
 
   @ManyToOne(() => User, (user) => user.posts)
   // @JoinColumn({ name: "userId" })
-  users: User[];
+  user: User;
 
   // mot post xuat hien nhieu trong postCategory
   @OneToMany(() => PostCategory, (postCategory) => postCategory.post)
