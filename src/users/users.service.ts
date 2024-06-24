@@ -15,12 +15,10 @@ export class UsersService {
     private userRepository: Repository<User>,
   ) {}
 
-
-  // Hash password
-  hashPassword = (password: string) => {
-    const salt = genSaltSync(10);
-    const hash = hashSync(password, salt);
-    return hash;
+  hashPassword = async (password: string) => {
+      const salt = genSaltSync(10);
+      const hash = hashSync(password, salt);
+      return hash;
   }
 
   // So sanh password bang ham compareSync() vi password trong db la hashpassword
@@ -32,7 +30,7 @@ export class UsersService {
     if(await this.isExistUser(createUserDto.email)){
       throw new BadRequestException("Email đã tồn tại");
     }
-    createUserDto.password = this.hashPassword(createUserDto.password);
+    createUserDto.password = await this.hashPassword(createUserDto.password);
     return await this.userRepository.save({...createUserDto, role: ROLE_USER});
   }
 
@@ -41,10 +39,11 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    if( !await this.userRepository.findOneById(id) ) {
+    const user = await this.userRepository.findOneById(+id);
+    if( !user ) {
       throw new BadRequestException("User không tồn tại");
     }
-    return await this.userRepository.findOneById(+id);
+    return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, user :IUser) {

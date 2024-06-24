@@ -32,7 +32,7 @@ export class PostsService {
       let categories: Category[] = [];
       for (let categoryID of createPostDto.categories) {
         const isExistCategory = await this.categoryService.isExistCategory(categoryID);
-        if (isExistCategory === null || isExistCategory === undefined) {
+        if ( !isExistCategory ) {
           throw new BadRequestException(`Không tìm thấy category với id: ${categoryID}`)
         }
         categories.push(isExistCategory);
@@ -69,8 +69,12 @@ export class PostsService {
     return `This action returns all posts`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  async findOne(id: number) {
+    let isExistPost = await this.postRepository.findOneById(id);
+    if ( !isExistPost ){
+      throw new NotFoundException(`Không tìm thấy post với id là: ${id}`);
+    }
+    return isExistPost;
   }
 
   async updateContent(id: number, updatePostDto: UpdatePostDto, user: IUser) {

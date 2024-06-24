@@ -1,9 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 import { Post } from "../../posts/entities/post.entity";
+import { BaseSchema } from "../../utils/base.schema";
 
 @Entity()
-export class Comment {
+export class Comment extends BaseSchema{
   @PrimaryGeneratedColumn()
   id: number;
 
