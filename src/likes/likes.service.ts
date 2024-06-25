@@ -52,6 +52,26 @@ export class LikesService {
     return queryBuilder.getRawMany();
   }
 
+  async findAllByPost(postID: number) {
+    const qbd = await this.likeRepository.createQueryBuilder('like')
+      .leftJoinAndSelect("like.user", "user")
+      .leftJoinAndSelect("like.post", "post")
+      .where("post.id = :id", { id: postID })
+      .andWhere("like.isDeleted is false")
+      .select([
+        'user.id',
+        'user.name',
+        'user.email',
+        'post.id',
+      ])
+      .getRawMany();
+
+    return {
+      total_like: qbd.length,
+      detail: qbd
+    };
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} like`;
   }
