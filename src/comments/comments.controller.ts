@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query } from "@nestjs/common";
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { User } from "../utils/decorators/user.decorator";
 import { IUser } from "../users/user.interface";
+import { ResponseMessage } from "../utils/decorators/response_message.decorator";
 
 @Controller('comments')
 export class CommentsController {
@@ -14,9 +15,10 @@ export class CommentsController {
     return this.commentsService.create(createCommentDto, user.id);
   }
 
-  @Get()
-  findAll() {
-    return this.commentsService.findAll();
+  @Get('post/:id')
+  @ResponseMessage('Lấy bình luận của một bài viết')
+  findAll(@Param('id') id: string) {
+    return this.commentsService.findAllByPost(+id);
   }
 
   @Get(':id')
