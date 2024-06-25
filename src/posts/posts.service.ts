@@ -61,9 +61,12 @@ export class PostsService {
     }
   }
 
-  async findAll(limit?: number, currentPage?: number){
+  async findAll(currentPage?: number, limit?: number, ){
     const qbd = this.queryBuilder();
-    const arr = await qbd.getRawMany();
+    const arr = await qbd
+      .skip((currentPage - 1) * limit)
+      .take(limit)
+      .getRawMany();
     return groupedCategory(arr);
   }
 
@@ -81,14 +84,6 @@ export class PostsService {
     const qbd = this.queryBuilder();
     qbd.andWhere("tag.label = :tagName", {tagName});
     return groupedCategory(await qbd.getRawMany());
-  }
-
-  findAllByUserId(userId: number){
-
-  }
-
-  async findById(id: number){
-
   }
 
 
@@ -169,8 +164,8 @@ export class PostsService {
         'cate.name',
         'user.name',
         'post.createdAt',
-        'COUNT(like.id) AS totalLikes',
-        'COUNT(cmt.id) AS totalComments',
+        'COUNT(DISTINCT like.id) AS totalLikes',
+        'COUNT(DISTINCT cmt.id) AS totalComments',
       ])
       .groupBy('post.id, post.title, post.userId, tag.label, cate.name, user.name, post.createdAt');
   }

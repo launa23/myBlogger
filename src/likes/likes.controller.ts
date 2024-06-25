@@ -18,7 +18,7 @@ export class LikesController {
 
   @Get('post/:id')
   findAllByPost(@Param('id') postId: string) {
-    return "this.likesService.getUsersWhoLikedPost(+postId)";
+    return this.likesService.findAllByPost(+postId);
   }
 
   @Get(':id')
