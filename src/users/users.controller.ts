@@ -10,12 +10,6 @@ import { Public } from "../utils/decorators/public.decorator";
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // @Public()
-  // @Post()
-  // create(@Body() createUserDto: CreateUserDto) {
-  //   return this.usersService.create(createUserDto);
-  // }
-
   @Get()
   findAll() {
     return this.usersService.findAll();

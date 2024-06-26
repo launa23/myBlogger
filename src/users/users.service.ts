@@ -73,4 +73,20 @@ export class UsersService {
     const isExist = await this.userRepository.findOneBy({email: email});
     return isExist ? true : false;
   }
+
+  updateUserToken = async (refreshToken: string, id: number) => {
+    return await this.userRepository.update({id: id}, {refreshToken})
+  }
+
+  async findUserByToken(token: string){
+    const user = await this.userRepository.findOneBy({refreshToken: token});
+    if( !user ) {
+      throw new BadRequestException("Refresh token không hợp lệ");
+    }
+    return user;
+  }
+
+  async deleteRefreshToken(id: number){
+    return await this.userRepository.update({id}, {refreshToken: null});
+  }
 }
