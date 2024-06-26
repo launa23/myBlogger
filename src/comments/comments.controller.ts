@@ -5,7 +5,9 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { User } from "../utils/decorators/user.decorator";
 import { IUser } from "../users/user.interface";
 import { ResponseMessage } from "../utils/decorators/response_message.decorator";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Comments')
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}

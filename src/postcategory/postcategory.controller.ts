@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PostcategoryService } from './postcategory.service';
 import { CreatePostcategoryDto } from './dto/create-postcategory.dto';
 import { UpdatePostcategoryDto } from './dto/update-postcategory.dto';
+import { ApiTags } from "@nestjs/swagger";
 
 @Controller('postcategory')
 export class PostcategoryController {

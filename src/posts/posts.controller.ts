@@ -21,7 +21,9 @@ import { UpdateCategoriesPostDto } from "./dto/update-categories-post";
 import { groupedCategory } from "../utils/transform";
 import { QueryResult } from "typeorm";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
