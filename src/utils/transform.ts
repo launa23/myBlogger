@@ -13,6 +13,7 @@ export function groupedCategory(arr: any[]): IPost[]{
         created_at: cur.post_createdAt,
         user_id: cur.userId,
         user_name: cur.user_name,
+        user_avatar: cur.user_avatar,
         total_likes: cur.totallikes,
         total_comments: cur.totalcomments,
         cate_name: [cur.cate_name]

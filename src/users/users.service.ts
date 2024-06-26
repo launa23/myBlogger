@@ -56,6 +56,16 @@ export class UsersService {
     return await this.userRepository.update(+id, { ...updateUserDto});
   }
 
+  async updateAvatar(user :IUser, filename: string) {
+    await this.findOne(user.id);
+    await this.userRepository.update(user.id, { avatar: filename });
+    return {
+      user_id: user.id,
+      avatar: filename
+    }
+  }
+
+
   async remove(id: number) {
     const isExistUser = await this.userRepository.findOneById(+id);
     if(!isExistUser) {

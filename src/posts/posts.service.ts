@@ -164,10 +164,11 @@ export class PostsService {
         'tag.label',
         'cate.name',
         'user.name',
+        'user.avatar',
         'post.createdAt',
         'COUNT(DISTINCT like.id) AS totalLikes',
         'COUNT(DISTINCT cmt.id) AS totalComments',
       ])
-      .groupBy('post.id, post.title, post.userId, post.thumbnail, post.content, tag.label, cate.name, user.name, post.createdAt');
+      .groupBy('post.id, post.title, post.userId, post.thumbnail, user.avatar, post.content, tag.label, cate.name, user.name, post.createdAt');
   }
 }
