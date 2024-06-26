@@ -20,38 +20,37 @@ export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
-    // @InjectRepository(Like)
-    // private readonly likeRepository: LikeRepository,
     private readonly postCategoryService: PostcategoryService,
     private readonly categoryService: CategoriesService,
     private readonly tagsService: TagsService,
     private readonly usersService: UsersService,
   ) { }
 
-  async create(createPostDto: CreatePostDto, userId: number) {
+  async create(createPostDto: CreatePostDto, userId: number, filename: string) {
       const user = await this.usersService.findOne(userId);
       const tag = await this.tagsService.isExistTag(createPostDto.tagId);
-      let categories: Category[] = [];
-      for (let categoryID of createPostDto.categories) {
+      const categories: Category[] = [];
+      for (const categoryID of createPostDto.categories) {
         const isExistCategory = await this.categoryService.isExistCategory(categoryID);
         if ( !isExistCategory ) {
           throw new BadRequestException(`Không tìm thấy category với id: ${categoryID}`)
         }
         categories.push(isExistCategory);
-      };
+      }
 
-      const post = await this.postRepository.save({...createPostDto, user, tag});
+      const post = await this.postRepository.save({...createPostDto, user, tag, thumbnail: filename});
     try {
       categories.forEach(async category => {
-        let postCategoryService1 = new PostCategory();
-        postCategoryService1.category = category;
-        postCategoryService1.post = post;
-        await this.postCategoryService.create(postCategoryService1);
+        const postCategory = new PostCategory();
+        postCategory.category = category;
+        postCategory.post = post;
+        await this.postCategoryService.create(postCategory);
       })
       return {
         title: createPostDto.title,
         content: createPostDto.content,
         categories: categories.map(category => category.name),
+        thumbnail: filename,
         tagName: tag.label
       };
     }
@@ -129,7 +128,7 @@ export class PostsService {
 
 
   async remove(id: number) {
-    let post = await this.isExistPost(id);
+    const post = await this.isExistPost(id);
     try {
       await this.postCategoryService.softDelete(post);
       return await this.postRepository.update({id}, {isDeleted: true, deletedAt: new Date()});
@@ -140,7 +139,7 @@ export class PostsService {
   }
 
   async isExistPost(id: number) {
-    let isExistPost = await this.postRepository.findOneById(id);
+    const isExistPost = await this.postRepository.findOneById(id);
     if ( !isExistPost ){
       throw new NotFoundException(`Không tìm thấy post với id là: ${id}`);
     }
@@ -160,6 +159,8 @@ export class PostsService {
         'post.id',
         'post.title',
         'post.userId',
+        'post.thumbnail',
+        'post.content',
         'tag.label',
         'cate.name',
         'user.name',
@@ -167,6 +168,6 @@ export class PostsService {
         'COUNT(DISTINCT like.id) AS totalLikes',
         'COUNT(DISTINCT cmt.id) AS totalComments',
       ])
-      .groupBy('post.id, post.title, post.userId, tag.label, cate.name, user.name, post.createdAt');
+      .groupBy('post.id, post.title, post.userId, post.thumbnail, post.content, tag.label, cate.name, user.name, post.createdAt');
   }
 }

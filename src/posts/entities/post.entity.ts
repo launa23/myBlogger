@@ -18,6 +18,9 @@ export class Post extends BaseSchema {
   @Column({ type: 'text' })
   content: string;
 
+  @Column({ type: 'text', nullable: true })
+  thumbnail: string;
+
   // Một post có 1 tag
   @ManyToOne(() => Tag)
   @JoinColumn({ name: "tagId" })
