@@ -6,6 +6,7 @@ import { JwtAuthGuard } from "./auth/guard/jwt-auth.guard";
 import { TransformInterceptor } from "./core/transform.interceptor";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import {join} from 'path';
+import cookieParser from "cookie-parser";
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
@@ -19,7 +20,7 @@ async function bootstrap() {
     },
     disableErrorMessages: false
   }));        // Khai bao de su dung Pipe de validate duw lieu thong qua cac decorator
-
+  app.use(cookieParser());
   app.useGlobalInterceptors(new TransformInterceptor(reflector));
   app.useStaticAssets(join(__dirname, '..', 'public'));     // Cho phep o ben ngoai co the xem duoc tai nguyen trong thu muc public
 // config CORS

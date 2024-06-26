@@ -33,6 +33,9 @@ export class User extends BaseSchema{
   @Column()
   role: string;
 
+  @Column({nullable: true})
+  refreshToken: string;
+
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
   //
