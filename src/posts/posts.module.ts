@@ -9,9 +9,18 @@ import { TagsModule } from "../tags/tags.module";
 import { UsersModule } from "../users/users.module";
 import { LikesModule } from "../likes/likes.module";
 import { LikeRepository } from "../likes/like.repository";
+import { MulterModule } from "@nestjs/platform-express";
+import { MulterConfigService } from "../utils/config/multer.config";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Post]), PostcategoryModule, CategoriesModule, TagsModule, UsersModule],
+  imports: [TypeOrmModule.forFeature([Post]),
+    MulterModule.registerAsync({
+      useClass: MulterConfigService
+    }),
+    PostcategoryModule,
+    CategoriesModule,
+    TagsModule,
+    UsersModule],
   controllers: [PostsController],
   providers: [PostsService],
   exports: [PostsService]

@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Put,
+  Query,
+  UseInterceptors,
+  UploadedFile
+} from "@nestjs/common";
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -8,6 +20,7 @@ import { ResponseMessage } from "../utils/decorators/response_message.decorator"
 import { UpdateCategoriesPostDto } from "./dto/update-categories-post";
 import { groupedCategory } from "../utils/transform";
 import { QueryResult } from "typeorm";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller('posts')
 export class PostsController {
@@ -15,8 +28,9 @@ export class PostsController {
 
   @ResponseMessage("Tạo post")
   @Post()
-  async create(@Body() createPostDto: CreatePostDto, @User() user: IUser) {
-    return await this.postsService.create(createPostDto, user.id);
+  @UseInterceptors(FileInterceptor('thumbnail'))
+  async create(@UploadedFile() file: Express.Multer.File, @Body() createPostDto: CreatePostDto, @User() user: IUser) {
+    return await this.postsService.create(createPostDto, user.id, file.filename);
   }
 
   @ResponseMessage("Lấy tất cả post")

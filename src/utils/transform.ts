@@ -8,6 +8,7 @@ export function groupedCategory(arr: any[]): IPost[]{
         post_id: cur.post_id,
         post_title: cur.post_title,
         post_content: cur.post_content,
+        post_thumbnail: cur.post_thumbnail,
         tag_label: cur.tag_label,
         created_at: cur.post_createdAt,
         user_id: cur.userId,

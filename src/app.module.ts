@@ -14,6 +14,7 @@ import { PostcategoryModule } from './postcategory/postcategory.module';
 import { TagsModule } from './tags/tags.module';
 import { PosttagModule } from './posttag/posttag.module';
 import { DatabaseModule } from "./database/database.module";
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { DatabaseModule } from "./database/database.module";
     LikesModule,
     PostcategoryModule,
     TagsModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
