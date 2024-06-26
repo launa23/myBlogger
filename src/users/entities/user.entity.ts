@@ -1,11 +1,6 @@
-import { SchemaFactory, Schema, Prop } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
 import { BaseSchema } from "../../utils/base.schema";
 import { BeforeInsert, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Post } from "../../posts/entities/post.entity";
-import { Like } from "../../likes/entities/like.entity";
-import { Comment } from "../../comments/entities/comment.entity";
-import { genSaltSync, hashSync } from "bcryptjs";
 
 export const ROLE_USER = "USER";
 export const ROLE_ADMIN = "ADMIN";
@@ -23,6 +18,9 @@ export class User extends BaseSchema{
 
   @Column()
   password: string;
+
+  @Column({nullable: true})
+  avatar: string;
 
   @Column({nullable: true})
   dob: Date;

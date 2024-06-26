@@ -48,7 +48,7 @@ export class CommentsService {
       .leftJoinAndSelect('cmt.user', 'user')
       .where("post.id = :id", {id})
       .andWhere('cmt.isDeleted is false')
-      .select(['cmt.id', 'parent.id', 'cmt.content', 'post.title', 'post.id', 'user.id', 'user.name'])
+      .select(['cmt.id', 'parent.id', 'cmt.content', 'post.title', 'post.id', 'user.id', 'user.name', 'user.avatar'])
       .getRawMany();
     return {
       post_id: id,
