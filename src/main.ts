@@ -1,12 +1,13 @@
 import { NestFactory, Reflector } from "@nestjs/core";
 import { AppModule } from './app.module';
 import { ConfigService } from "@nestjs/config";
-import { flatten, ValidationPipe, VersioningType } from "@nestjs/common";
+import { ValidationPipe, VersioningType } from "@nestjs/common";
 import { JwtAuthGuard } from "./auth/guard/jwt-auth.guard";
 import { TransformInterceptor } from "./core/transform.interceptor";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import {join} from 'path';
 import cookieParser from "cookie-parser";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
@@ -37,6 +38,25 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: ['1', '2']
   });
+
+  // Config swagger API
+  const config = new DocumentBuilder()
+    .setTitle('My Blogger')
+    .setDescription('My Blogger API description')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'Bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+      },
+      'token',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   await app.listen(configService.get<string>("PORT"));
 }
 bootstrap();

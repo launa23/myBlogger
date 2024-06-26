@@ -5,7 +5,9 @@ import { UpdateLikeDto } from './dto/update-like.dto';
 import { User } from "../utils/decorators/user.decorator";
 import { IUser } from "../users/user.interface";
 import { ResponseMessage } from "../utils/decorators/response_message.decorator";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Likes')
 @Controller('likes')
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}

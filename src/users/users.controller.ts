@@ -7,7 +7,9 @@ import { User } from "../utils/decorators/user.decorator";
 import { Public } from "../utils/decorators/public.decorator";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ResponseMessage } from "../utils/decorators/response_message.decorator";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
