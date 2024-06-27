@@ -25,7 +25,7 @@ export class CategoriesService {
   }
 
   async findByIds(ids: number[]) {
-    for(let id of ids){
+    for(const id of ids){
         if ( ! await this.isExistCategory(id)) {
           throw new NotFoundException(`Không tìm thấy category với id là: ${id}`);
         }

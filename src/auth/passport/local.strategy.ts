@@ -10,7 +10,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
   // Ham nay se tu dong duoc goi khi login, nen ham validateUser(username, password) cung se tu dong duoc goi
   async validate(username: string, password: string): Promise<any> {
-    let user = await this.authService.validateUser(username, password);
+    const user = await this.authService.validateUser(username, password);
     if (!user) {
       throw new UnauthorizedException("Token không hợp lệ!");
     }

@@ -18,10 +18,11 @@ import { User } from "../utils/decorators/user.decorator";
 import { IUser } from "../users/user.interface";
 import { ResponseMessage } from "../utils/decorators/response_message.decorator";
 import { UpdateCategoriesPostDto } from "./dto/update-categories-post";
-import { groupedCategory } from "../utils/transform";
-import { QueryResult } from "typeorm";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiTags } from "@nestjs/swagger";
+import { Roles } from "../utils/decorators/roles.decorator";
+import { Role } from "../utils/app.constant";
+import { Public } from "../utils/decorators/public.decorator";
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -31,10 +32,12 @@ export class PostsController {
   @ResponseMessage("Tạo post")
   @Post()
   @UseInterceptors(FileInterceptor('thumbnail'))
+  @Roles(Role.USER)
   async create(@UploadedFile() file: Express.Multer.File, @Body() createPostDto: CreatePostDto, @User() user: IUser) {
     return await this.postsService.create(createPostDto, user.id, file.filename);
   }
 
+  @Public()
   @ResponseMessage("Lấy tất cả post")
   @Get()
   async findAll(@Query("currentPage") currentPage: string,
@@ -43,12 +46,14 @@ export class PostsController {
     return result.length > 0 ? result : "Không có bài post nào!";
   }
 
+  @Public()
   @ResponseMessage("Lấy ra tất cả bài viết theo danh mục")
   @Get('category')
   getAllByCategory(@Query("categoryName") cateName: string){
     return this.postsService.findByCategory(cateName);
   }
 
+  @Public()
   @ResponseMessage("Lấy ra post theo tag")
   @Get('/tag')
   async getByTag(@Query('tagName') tagName: string) {
@@ -56,6 +61,7 @@ export class PostsController {
     return result.length > 0 ? result : `Không có bài post nào với tag là ${tagName}!`;
   }
 
+  @Public()
   @ResponseMessage("Lấy ra post theo id")
   @Get(':id')
   async findOne(@Param('id') id: string) {
@@ -65,6 +71,7 @@ export class PostsController {
 
   @ResponseMessage("Cập nhật bài viết")
   @Put('content/:id')
+  @Roles(Role.USER)
   updateContent(@Param('id') id: string,
                 @Body() updatePostDto: UpdatePostDto,
                 @User() user: IUser) {
@@ -77,6 +84,7 @@ export class PostsController {
     return this.postsService.updateCategories(+id, updatePostDto);
   }
 
+  @Roles(Role.USER, Role.ADMIN)
   @ResponseMessage("Xóa bài post")
   @Delete(':id')
   remove(@Param('id') id: string) {
