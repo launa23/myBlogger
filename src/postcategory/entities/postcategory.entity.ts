@@ -8,11 +8,11 @@ export class PostCategory {
   id: number;
 
   @ManyToOne(() => Post)
-  @JoinColumn({name: "postId"})
+  @JoinColumn({name: "post_id"})
   post: Post;
 
   @ManyToOne(() => Category)
-  @JoinColumn({name: "categoryId"})
+  @JoinColumn({name: "category_id"})
   category: Category;
 
   @Column({ default: false })

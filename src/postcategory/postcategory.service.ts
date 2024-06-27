@@ -31,7 +31,7 @@ export class PostcategoryService {
   }
 
   async findByCategoryID(post: Post){
-    return this.postCategoryRepository.findBy({ post })
+    // return this.postCategoryRepository.findBy({ post })
   }
 
 
@@ -44,10 +44,10 @@ export class PostcategoryService {
   }
 
   async delete(post: Post){
-    await this.postCategoryRepository.delete({post})
+    // await this.postCategoryRepository.delete({post})
   }
 
   async softDelete(post: Post){
-    await this.postCategoryRepository.update({post}, {isDeleted: true});
+    // await this.postCategoryRepository.update({post}, {isDeleted: true});
   }
 }

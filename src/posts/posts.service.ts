@@ -27,18 +27,18 @@ export class PostsService {
   ) { }
 
   async create(createPostDto: CreatePostDto, userId: number, filename: string) {
-      const user = await this.usersService.findOne(userId);
-      const tag = await this.tagsService.isExistTag(createPostDto.tagId);
-      const categories: Category[] = [];
-      for (const categoryID of createPostDto.categories) {
-        const isExistCategory = await this.categoryService.isExistCategory(categoryID);
-        if ( !isExistCategory ) {
-          throw new BadRequestException(`Không tìm thấy category với id: ${categoryID}`)
-        }
-        categories.push(isExistCategory);
+    const user = await this.usersService.findOne(userId);
+    const tag = await this.tagsService.isExistTag(createPostDto.tagId);
+    const categories: Category[] = [];
+    for (const categoryID of createPostDto.categories) {
+      const isExistCategory = await this.categoryService.isExistCategory(categoryID);
+      if ( !isExistCategory ) {
+        throw new BadRequestException(`Không tìm thấy category với id: ${categoryID}`)
       }
+      categories.push(isExistCategory);
+    }
 
-      const post = await this.postRepository.save({...createPostDto, user, tag, thumbnail: filename});
+    const post = await this.postRepository.save({...createPostDto, user, tag, thumbnail: filename});
     try {
       categories.forEach(async category => {
         const postCategory = new PostCategory();
@@ -63,10 +63,21 @@ export class PostsService {
   async findAll(currentPage?: number, limit?: number, ){
     const qbd = this.queryBuilder();
     const arr = await qbd
-      .skip((currentPage - 1) * limit)
-      .take(limit)
+      .orderBy('post.createdAt', 'DESC')
+      .limit(limit)
+      .offset( limit * currentPage - limit )
       .getRawMany();
-    return groupedCategory(arr);
+    const total = await this.postRepository
+      .createQueryBuilder("post")
+      .where('post.isDeleted is false')
+      .getCount();
+    return {
+      total_post: total,
+      total_page: Math.ceil(total / limit),
+      current_page: currentPage,
+      limit: limit,
+      data: arr
+    };
   }
 
   async getOneById(id: number){
@@ -75,14 +86,14 @@ export class PostsService {
   }
 
   async findByCategory(cateName: string){
-    const arr = await this.findAll();
-    return arr.filter(post => post.cate_name.includes(cateName));
+    const arr = await this.queryBuilder().getRawMany();
+    return arr.filter(post => post.cate_name?.some(name => name.toLowerCase().includes(cateName.toLowerCase())));
   }
 
   async findByTag(tagName: string){
     const qbd = this.queryBuilder();
     qbd.andWhere("tag.label = :tagName", {tagName});
-    return groupedCategory(await qbd.getRawMany());
+    return await qbd.getRawMany();
   }
 
 
@@ -148,27 +159,25 @@ export class PostsService {
 
   queryBuilder(){
     return this.postRepository.createQueryBuilder('post')
-      .leftJoinAndSelect( 'post.likes', 'like')
-      .leftJoinAndSelect( 'post.comments', 'cmt')
-      .leftJoinAndSelect( 'post.tag', 'tag')
-      .leftJoinAndSelect( 'post.postCategories', 'pc')
-      .leftJoinAndSelect( 'post.user', 'user')
-      .leftJoinAndSelect( 'pc.category', 'cate')
-      .where("post.isDeleted = false")
       .select([
-        'post.id',
-        'post.title',
-        'post.userId',
-        'post.thumbnail',
-        'post.content',
-        'tag.label',
-        'cate.name',
-        'user.name',
-        'user.avatar',
-        'post.createdAt',
-        'COUNT(DISTINCT like.id) AS totalLikes',
-        'COUNT(DISTINCT cmt.id) AS totalComments',
+        "post.id AS post_id",
+        "tag.label AS tag",
+        "post.title AS post_title",
+        "post.content AS post_content",
+        "post.createdAt AS created_at",
+        "user.id AS user_id",
+        "user.avatar AS user_avatar",
+        "post.thumbnail AS post_thumbnail",
+        "user.name AS user_name",
+        "(SELECT COUNT(*) FROM likes WHERE likes.post_id = post.id) AS total_likes",
+        "(SELECT COUNT(*) FROM comment WHERE comment.post_id = post.id) AS total_comments",
+        "(SELECT array_agg(category.name) FROM post_category pc JOIN category ON pc.category_id = category.id WHERE pc.post_id = post.id) AS cate_name"
       ])
-      .groupBy('post.id, post.title, post.userId, post.thumbnail, user.avatar, post.content, tag.label, cate.name, user.name, post.createdAt');
+      .leftJoin("post.user", "user")
+      .leftJoin("post.tag", "tag")
+      .leftJoin("post.postCategories", "post_category")
+      .leftJoin("post_category.category", "category")
+      .where('post.isDeleted is false')
+      .groupBy("post.id, user.id, tag.label");
   }
 }

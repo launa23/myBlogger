@@ -16,7 +16,7 @@ export class LikesController {
 
   @Post()
   @ResponseMessage("Like like like...")
-  @Roles(Role.USER)
+  // @Roles(Role.USER)
   create(@Body() createLikeDto: CreateLikeDto, @User() user: IUser) {
     return this.likesService.sendLike(createLikeDto, user.id);
   }

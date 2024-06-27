@@ -1,6 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { PostCategory } from "../../postcategory/entities/postcategory.entity";
 import { BaseSchema } from "../../utils/base.schema";
+import { Post } from "../../posts/entities/post.entity";
 
 @Entity()
 export class Category extends BaseSchema{
@@ -13,7 +14,9 @@ export class Category extends BaseSchema{
   @Column({ type: 'text' })
   desc: string;
 
-  // Thuoc tinh nay se khong duoc hien thi tren DB
+  // @ManyToMany(() => Post, (post) => post.categories)
+  // posts: Post[];
+
   @OneToMany(() => PostCategory, (postCategory) => postCategory.category)
   postCategories: PostCategory[];
 }
