@@ -1,10 +1,20 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn
+} from "typeorm";
 import { PostCategory } from "../../postcategory/entities/postcategory.entity";
 import { User } from "../../users/entities/user.entity";
 import { Like } from "../../likes/entities/like.entity";
 import { Comment } from "../../comments/entities/comment.entity";
 import { BaseSchema } from "src/utils/base.schema";
 import { Tag } from "../../tags/entities/tag.entity";
+import { Category } from "../../categoies/entities/category.entity";
 
 @Entity()
 export class Post extends BaseSchema {
@@ -26,17 +36,18 @@ export class Post extends BaseSchema {
   tag: Tag;
 
   @ManyToOne(() => User, (user) => user.posts)
-  // @JoinColumn({ name: "userId" })
   user: User;
 
-  // mot post xuat hien nhieu trong postCategory
-  @OneToMany(() => PostCategory, (postCategory) => postCategory.post)
+  // @ManyToMany(() => Category, (category) => category.posts)
+  // @JoinTable( )
+  // categories: Category[];
+
+  @OneToMany(() => PostCategory, (postCategory) => postCategory.category)
   postCategories: PostCategory[];
 
-  //
   @OneToMany(() => Like, (like) => like.post)
   likes: Like[];
-  //
+
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
 }

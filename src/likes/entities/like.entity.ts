@@ -12,7 +12,7 @@ export class Like {
   user: User;
 
   @ManyToOne(() => Post, post => post.likes)
-  // @JoinColumn({name: "postId"})
+  @JoinColumn({name: "post_id"})
   post: Post;
 
   //Khi xóa post hoặc xóa user thì isDeleted = true
