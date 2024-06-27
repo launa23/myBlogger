@@ -32,7 +32,7 @@ export class PostsController {
   @ResponseMessage("Tạo post")
   @Post()
   @UseInterceptors(FileInterceptor('thumbnail'))
-  // @Roles(Role.USER)
+  @Roles(Role.USER)
   async create(@UploadedFile() file: Express.Multer.File, @Body() createPostDto: CreatePostDto, @User() user: IUser) {
     return await this.postsService.create(createPostDto, user.id, file.filename);
   }
@@ -43,7 +43,6 @@ export class PostsController {
   async findAll(@Query("currentPage") currentPage: string,
                 @Query("limit") limit: string) {
     const result = await this.postsService.findAll(+currentPage, +limit);
-    // return result.length > 0 ? result : "Không có bài post nào!";
     return result;
 
   }

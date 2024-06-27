@@ -18,7 +18,7 @@ export class Comment extends BaseSchema{
   content: string;
 
   @ManyToOne(() => User, {eager: true})
-  @JoinColumn({name: "userId"})
+  @JoinColumn({name: "user_id"})
   user: User;
 
   @ManyToOne(() => Post, {eager: true})
@@ -26,6 +26,7 @@ export class Comment extends BaseSchema{
   post: Post;
 
   @ManyToOne(() => Comment, { nullable: true })
-  @JoinColumn({name: "parentId"})
+  @JoinColumn({name: "parent_id"})
   parent: Comment;
+
 }

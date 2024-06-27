@@ -8,7 +8,6 @@ import { ResponseMessage } from "../utils/decorators/response_message.decorator"
 import { ApiTags } from "@nestjs/swagger";
 import { Roles } from "../utils/decorators/roles.decorator";
 import { Role } from "../utils/app.constant";
-import { RolesGuard } from "../auth/guard/roles.guard";
 
 @ApiTags('Users')
 @Controller('users')
@@ -16,7 +15,6 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  // @UseGuards(RolesGuard)
   findAll() {
     return this.usersService.findAll();
   }
