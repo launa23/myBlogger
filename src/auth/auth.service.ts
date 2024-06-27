@@ -82,7 +82,7 @@ export class AuthService {
       this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET')
       })
-      let user = await this.usersService.findUserByToken(refreshToken);
+      const user = await this.usersService.findUserByToken(refreshToken);
       if (user){
         // Có user thì dùng lại hàm login đế sinh ra 1 access token mới
         const { email, role, id, name } = user;

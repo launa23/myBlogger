@@ -1,13 +1,12 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import mongoose, { Model } from "mongoose";
-import { ROLE_USER, User } from "./entities/user.entity";
-import { InjectModel } from "@nestjs/mongoose";
+import { User } from "./entities/user.entity";
 import { genSaltSync, hashSync, compareSync } from "bcryptjs";
 import { IUser } from "./user.interface";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Role } from "../utils/app.constant";
 @Injectable()
 export class UsersService {
   constructor(
@@ -31,7 +30,7 @@ export class UsersService {
       throw new BadRequestException("Email đã tồn tại");
     }
     createUserDto.password = await this.hashPassword(createUserDto.password);
-    return await this.userRepository.save({...createUserDto, role: ROLE_USER});
+    return await this.userRepository.save({...createUserDto, role: Role.USER});
   }
 
   findAll() {

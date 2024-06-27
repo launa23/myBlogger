@@ -3,7 +3,6 @@ import { PostCategory } from "../../postcategory/entities/postcategory.entity";
 import { User } from "../../users/entities/user.entity";
 import { Like } from "../../likes/entities/like.entity";
 import { Comment } from "../../comments/entities/comment.entity";
-import { PostTag } from "../../posttag/entities/posttag.entity";
 import { BaseSchema } from "src/utils/base.schema";
 import { Tag } from "../../tags/entities/tag.entity";
 

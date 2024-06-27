@@ -2,9 +2,6 @@ import { BaseSchema } from "../../utils/base.schema";
 import { BeforeInsert, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Post } from "../../posts/entities/post.entity";
 
-export const ROLE_USER = "USER";
-export const ROLE_ADMIN = "ADMIN";
-
 @Entity()
 export class User extends BaseSchema{
   @PrimaryGeneratedColumn()

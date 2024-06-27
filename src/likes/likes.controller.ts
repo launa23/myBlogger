@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { LikesService } from './likes.service';
-import { CreateLikeDto } from './dto/create-like.dto';
-import { UpdateLikeDto } from './dto/update-like.dto';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { LikesService } from "./likes.service";
+import { CreateLikeDto } from "./dto/create-like.dto";
+import { UpdateLikeDto } from "./dto/update-like.dto";
 import { User } from "../utils/decorators/user.decorator";
 import { IUser } from "../users/user.interface";
 import { ResponseMessage } from "../utils/decorators/response_message.decorator";
 import { ApiTags } from "@nestjs/swagger";
+import { Role } from "../utils/app.constant";
+import { Roles } from "../utils/decorators/roles.decorator";
 
 @ApiTags('Likes')
 @Controller('likes')
@@ -14,6 +16,7 @@ export class LikesController {
 
   @Post()
   @ResponseMessage("Like like like...")
+  @Roles(Role.USER)
   create(@Body() createLikeDto: CreateLikeDto, @User() user: IUser) {
     return this.likesService.sendLike(createLikeDto, user.id);
   }

@@ -8,23 +8,27 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import {join} from 'path';
 import cookieParser from "cookie-parser";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { RolesGuard } from "./auth/guard/roles.guard";
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
 
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector));
+  app.useGlobalGuards(new RolesGuard(reflector));
+  // Khai bao de su dung Pipe de validate du lieu thong qua cac decorator
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
     transformOptions: {
       enableImplicitConversion: true
     },
     disableErrorMessages: false
-  }));        // Khai bao de su dung Pipe de validate duw lieu thong qua cac decorator
+  }));
   app.use(cookieParser());
   app.useGlobalInterceptors(new TransformInterceptor(reflector));
   app.useStaticAssets(join(__dirname, '..', 'public'));     // Cho phep o ben ngoai co the xem duoc tai nguyen trong thu muc public
-// config CORS
+
+  // config CORS
   app.enableCors({
     "origin": true,    // Những nguồn có thể đi qua, * là tất cả
     "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",

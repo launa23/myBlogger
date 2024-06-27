@@ -7,6 +7,8 @@ import { Comment } from "./entities/comment.entity";
 import { UsersService } from "../users/users.service";
 import { PostsService } from "../posts/posts.service";
 import { buildCommentTree } from "../utils/transform";
+import { IUser } from "../users/user.interface";
+import { Role } from "../utils/app.constant";
 
 @Injectable()
 export class CommentsService {
@@ -66,14 +68,20 @@ export class CommentsService {
     return comment;
   }
 
-  async update(id: number, updateCommentDto: UpdateCommentDto) {
+  async update(id: number, updateCommentDto: UpdateCommentDto, user: IUser) {
     const post = await this.postService.findOne(updateCommentDto.postId);
-    await this.findOne(id, `Không tìm thấy comment với id là ${id}`);
+    const comment = await this.findOne(id, `Không tìm thấy comment với id là ${id}`);
+    if(comment.user.id !== user.id){
+      throw new BadRequestException("Bạn không thể sửa bình luận này!")
+    }
     return await this.commentRepository.update({id: id},{content: updateCommentDto.content})
   }
 
-  async remove(id: number) {
-    await this.findOne(id, `Không tìm thấy comment với id là ${id}`);
+  async remove(id: number, user: IUser) {
+    const comment = await this.findOne(id, `Không tìm thấy comment với id là ${id}`);
+    if( comment.user.id !== user.id && user.role !== Role.ADMIN ){
+      throw new BadRequestException("Bạn không thể xóa bình luận này!")
+    }
     return await this.commentRepository.update({id: id},{isDeleted: true, deletedAt: new Date()})
   }
 }
