@@ -1,7 +1,7 @@
-import { Inject, Injectable, NotFoundException, forwardRef, BadGatewayException, BadRequestException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Repository, Transaction, TransactionOptions, EntityManager, SelectQueryBuilder } from "typeorm";
+import { Repository } from "typeorm";
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostcategoryService } from 'src/postcategory/postcategory.service';
@@ -12,7 +12,6 @@ import { TagsService } from "../tags/tags.service";
 import { IUser } from "../users/user.interface";
 import { UsersService } from "../users/users.service";
 import { UpdateCategoriesPostDto } from "./dto/update-categories-post";
-import { groupedCategory } from "../utils/transform";
 
 @Injectable()
 export class PostsService {
@@ -82,7 +81,7 @@ export class PostsService {
 
   async getOneById(id: number){
     const qbd = this.queryBuilder().andWhere("post.id = :id", {id});
-    return groupedCategory(await qbd.getRawMany());
+    return await qbd.getRawMany();
   }
 
   async findByCategory(cateName: string){
