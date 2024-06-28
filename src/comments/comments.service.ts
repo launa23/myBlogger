@@ -43,19 +43,29 @@ export class CommentsService {
     };
   }
 
-  async findAllByPost(id: number){
-    const qb = await this.commentRepository.createQueryBuilder('cmt')
-      .leftJoinAndSelect('cmt.parent', 'parent')
-      .leftJoinAndSelect('cmt.post', 'post')
-      .leftJoinAndSelect('cmt.user', 'user')
-      .where("post.id = :id", {id})
-      .andWhere('cmt.isDeleted is false')
-      .select(['cmt.id', 'parent.id', 'cmt.content', 'post.title', 'post.id', 'user.id', 'user.name', 'user.avatar'])
-      .getRawMany();
+  async findAllByPost(id: number, limit: number, currentPage: number, parent_id?: number) {
+    const qb = this.queryBuilder(limit, currentPage);
+    const qbTotal = this.commentRepository
+      .createQueryBuilder("cmt")
+      .where('cmt.isDeleted is false')
+      .leftJoinAndSelect('cmt.post', 'post');
+    let comments = [];
+    let total = 0;
+    if (!parent_id){
+      comments = await qb.andWhere(' post.id = :id and parent.id is null', {id}).getRawMany();
+      total = await qbTotal.andWhere(' post.id = :id and parent_id is null', {id}).getCount();
+    }
+    else {
+      comments = await qb.andWhere(' post.id = :id and parent.id = :parent_id', {id, parent_id}).getRawMany();
+      total = await qbTotal.andWhere(' post.id = :id and parent_id = :parent_id', {id, parent_id}).getCount();
+    }
     return {
       post_id: id,
-      total: qb.length,
-      comments: buildCommentTree(qb)
+      total_comment: total,
+      total_page: Math.ceil(total / limit),
+      current_page: currentPage,
+      limit: limit,
+      comments: comments
     };
   }
 
@@ -84,7 +94,30 @@ export class CommentsService {
     }
     return await this.commentRepository.update({id: id},{isDeleted: true, deletedAt: new Date()})
   }
+
+  queryBuilder = (limit: number, currentPage :number) => {
+    return this.commentRepository.createQueryBuilder('cmt')
+      .leftJoinAndSelect('cmt.parent', 'parent')
+      .leftJoinAndSelect('cmt.post', 'post')
+      .leftJoinAndSelect('cmt.user', 'user')
+      .where("cmt.isDeleted is false")
+      .select([
+        'cmt.id',
+        'parent.id',
+        'cmt.content',
+        'post.title',
+        'post.id',
+        'user.id',
+        'user.name',
+        'user.avatar',
+        '(SELECT COUNT(*) FROM comment as cmt2 WHERE cmt2.parent_id = cmt.id) AS total_children'
+      ])
+      .limit(limit)
+      .offset(limit*currentPage-limit)
+  }
 }
+
+
 
 
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { CommentsService } from "./comments.service";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { UpdateCommentDto } from "./dto/update-comment.dto";
@@ -24,8 +24,14 @@ export class CommentsController {
   @Public()
   @Get('post/:id')
   @ResponseMessage('Lấy bình luận của một bài viết')
-  findAll(@Param('id') id: string) {
-    return this.commentsService.findAllByPost(+id);
+  findComment(@Param('id') id: string,
+          @Query("currentPage") currentPage: string,
+          @Query("limit") limit: string,
+          @Query("parent_id") parent_id?: string) {
+    if (isNaN(+parent_id)){
+      return this.commentsService.findAllByPost(+id, +limit, +currentPage);
+    }
+    return this.commentsService.findAllByPost(+id, +limit, +currentPage, +parent_id);
   }
 
   @Public()
